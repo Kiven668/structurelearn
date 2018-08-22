@@ -1,2 +1,2 @@
-# structurelearn
+# structure learn
 learn structure
