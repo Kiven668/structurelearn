@@ -2,6 +2,9 @@ package com.structure.tree;
 
 import com.structure.stack.LinkListStack;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class BinarySearchTree<E extends  Comparable<E>> {
     private Node root;
     private int size;
@@ -159,6 +162,57 @@ public class BinarySearchTree<E extends  Comparable<E>> {
             System.out.println(node.e);
     }
 
+    public void levelOrder() {
+        Queue<Node> queue = new LinkedList<Node>();
+
+        queue.add(root);
+        while(!queue.isEmpty()) {
+            Node cur = queue.remove();
+            System.out.println(cur.e);
+
+            if (cur.left != null) {
+                queue.add(cur.left);
+            }
+            if (cur.right != null) {
+                queue.add(cur.right);
+            }
+        }
+    }
+
+    public void remove(E e) {
+        root = remove(root, e);
+    }
+
+    private Node remove(Node node, E e) {
+        if (node == null) return null;
+
+        if (e.compareTo(node.e) < 0) {
+            //如果比当前节点小，递归从左子树中删除
+            node.left = remove(node.left, e);
+            return node;
+        } else if (e.compareTo(node.e) > 0) {
+            //如果比当前节点大，递归从右子树中删除
+            node.right = remove(node.right, e);
+            return node;
+        } else {
+            //如果相等，则进行删除操作
+            //1.先找出右子树的最小节点
+            //2.把右子树的最小节点从右子树删除
+            //3.用右子树的最小节点替换删除的节点
+            //!!!!因为removeMin中执行了size--，但实际上min这个节点并没有从树种删除，所以不需要再进行size--操作
+            Node newNode = minimum(node.right);
+            newNode.right = removeMin(node.right);
+            newNode.left = node.left;
+            //也可以使用左子树的最大子节点替换当前节点
+//            Node newNode = maxmum(node.left);
+//            newNode.left = removeMax(node.left);
+//            newNode.right = node.right;
+
+            node.left = node.right = null;
+            return newNode;
+        }
+    }
+
 //    private void add(Node node, E e) {
 //        if (e.compareTo(root.e) == 0) {
 //            return;
@@ -203,12 +257,101 @@ public class BinarySearchTree<E extends  Comparable<E>> {
         }
     }
 
+    public E minimum() {
+        if (root == null) {
+            return null;
+        }
+        Node cur = root;
+        while (cur.left != null) {
+            cur = cur.left;
+        }
+        return cur.e;
+        //recursion way
+//        Node node = minimum(root);
+//        return node == null ? null : node.e;
+    }
+
+    private Node minimum(Node node) {
+        if (node == null || node.left == null) {
+            return node;
+        }
+
+        return minimum(node.left);
+    }
+
+
+
+    public E maxmum() {
+//        if (root == null) {
+//            return null;
+//        }
+//        Node cur = root;
+//        while (cur.right != null) {
+//            cur = cur.right;
+//        }
+//        return cur.e;
+        //recursion way
+        Node node = maxmum(root);
+        return node == null ? null : node.e;
+    }
+
+    private Node maxmum(Node node) {
+        if (node == null || node.right == null) {
+            return node;
+        }
+
+        return maxmum(node.right);
+    }
+
+    public E removeMin() {
+        E e = minimum();
+
+        root = removeMin(root);
+
+        return e;
+    }
+
+    /**
+     * @Description: 删除节点下的最小子节点
+     * @Param: [node]
+     * @return: com.structure.tree.BinarySearchTree<E>.Node
+     */
+    private Node removeMin(Node node) {
+        if (node.left == null) {
+            Node rightNode = node.right;
+            node.right = null;
+            size--;
+            return rightNode;
+        }
+
+        node.left = removeMin(node.left);
+
+        return node;
+    }
+    /**
+     * @Description: 删除节点下的最大子节点
+     * @Param: [node]
+     * @return: com.structure.tree.BinarySearchTree<E>.Node
+     */
+    private Node removeMax(Node node) {
+        if (node.right == null) {
+            Node leftNode = node.left;
+            node.left = null;
+            size--;
+            return leftNode;
+        }
+
+        node.right = removeMin(node.right);
+
+        return node;
+    }
+
     private enum TraverseType {
         PREORDER, INORDER, LASTORDER
     }
 
     public static void main(String[] args) {
-        int[] arr = {7, 4, 2, 5, 6, 9};
+        int[] arr = {40, 4, 15 ,23, 56, 78, 32, 49, 60, 68};
 
         BinarySearchTree<Integer> tree = new BinarySearchTree<>();
         for (int i = 0; i < arr.length; i++) {
@@ -217,6 +360,11 @@ public class BinarySearchTree<E extends  Comparable<E>> {
         tree.preOrderNS();
         System.out.println("---------------");
 
-        tree.inOrderNR();
+        tree.levelOrder();
+        System.out.println("Minimum value : " + tree.minimum());
+        System.out.println("Maxmum value : " + tree.maxmum());
+
+        tree.remove(56);
+        tree.preOrderNS();
     }
 }
