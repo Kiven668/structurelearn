@@ -1,5 +1,7 @@
 package com.structure.tree;
 
+import com.structure.stack.LinkListStack;
+
 public class BinarySearchTree<E extends  Comparable<E>> {
     private Node root;
     private int size;
@@ -74,22 +76,84 @@ public class BinarySearchTree<E extends  Comparable<E>> {
         return res.toString();
     }
 
+    /**
+     * @Description: preorder traversal with recursion
+     * @Param: []
+     * @return: void
+     */
     public void preOrder() {
-        preOrder(TraverseType.PREORDER, root);
+        order(TraverseType.PREORDER, root);
     }
 
-    private void preOrder(TraverseType type, Node node) {
+    /** 
+     * @Description: preorder traversal without recursion 
+     * @Param: [] 
+     * @return: void
+     */ 
+    public void preOrderNS() {
+        if (root == null) return;
+
+        LinkListStack<Node> stack = new LinkListStack<>();
+        stack.push(root);
+        while (!stack.isEmpty()) {
+            Node cur = stack.pop();
+            System.out.println(cur.e);
+
+            if (cur.right != null) {
+                stack.push(cur.right);
+            }
+
+            if (cur.left != null) {
+                stack.push(cur.left);
+            }
+        }
+    }
+
+    /**
+     * @Description: inorder traversal with recursion
+     * @Param: []
+     * @return: void
+     */
+    public void inOrder() {
+        order(TraverseType.INORDER, root);
+    }
+
+    /**
+     * @Description: inorder traversal without recursion
+     * @Param: []
+     * @return: void
+     */
+    public void inOrderNR() {
+        if (root == null) return;
+
+        LinkListStack<Node> stack = new LinkListStack<>();
+        Node cur = root;
+        while (cur != null || !stack.isEmpty()) {
+            while (cur != null) {
+                stack.push(cur);
+                cur = cur.left;
+            }
+
+            if (!stack.isEmpty()) {
+                cur = stack.pop();
+                System.out.println(cur.e);
+                cur = cur.right;
+            }
+        }
+    }
+
+    private void order(TraverseType type, Node node) {
         if (node == null) return;
 
         if (type.equals(TraverseType.PREORDER))
             System.out.println(node.e);
 
-        preOrder(type, node.left);
+        order(type, node.left);
 
         if (type.equals(TraverseType.INORDER))
             System.out.println(node.e);
 
-        preOrder(type, node.right);
+        order(type, node.right);
 
         if (type.equals(TraverseType.LASTORDER))
             System.out.println(node.e);
@@ -132,6 +196,11 @@ public class BinarySearchTree<E extends  Comparable<E>> {
             this.left = null;
             this.right = null;
         }
+
+        @Override
+        public String toString() {
+            return e.toString();
+        }
     }
 
     private enum TraverseType {
@@ -139,14 +208,15 @@ public class BinarySearchTree<E extends  Comparable<E>> {
     }
 
     public static void main(String[] args) {
-        int[] arr = {5, 3, 2, 4, 6, 8};
+        int[] arr = {7, 4, 2, 5, 6, 9};
 
         BinarySearchTree<Integer> tree = new BinarySearchTree<>();
         for (int i = 0; i < arr.length; i++) {
             tree.add(arr[i]);
         }
-        tree.preOrder();
+        tree.preOrderNS();
+        System.out.println("---------------");
 
-        System.out.println(tree);
+        tree.inOrderNR();
     }
 }

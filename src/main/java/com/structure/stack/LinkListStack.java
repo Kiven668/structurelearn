@@ -6,7 +6,7 @@ public class LinkListStack<E> implements Stack<E> {
     private LinkedList<E> list;
 
     public LinkListStack() {
-        new LinkedList<E>();
+        list = new LinkedList<E>();
     }
 
     public int getSize() {
@@ -27,5 +27,11 @@ public class LinkListStack<E> implements Stack<E> {
 
     public E peek() {
         return list.getFirst();
+    }
+
+    @Override
+    public String toString() {
+
+        return  list.toString();
     }
 }
